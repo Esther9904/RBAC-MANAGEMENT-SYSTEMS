@@ -29,6 +29,9 @@ def get_meta():
 def get_demo_users():
     return jsonify(_services()["users"].list_for_switcher())
 
+@api.get("/me")
+def get_me():
+    return jsonify(_services()["access"].describe(request.headers.get(ACTOR_HEADER)))
 
 @api.get("/users")
 @require_permission("users:read", action="List users", log_allowed=False)

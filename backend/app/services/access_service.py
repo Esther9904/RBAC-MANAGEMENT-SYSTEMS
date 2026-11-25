@@ -20,6 +20,18 @@ class AccessService:
                 granted.update(role["permissions"])
         return granted
 
+
+    def describe(self, user_id):
+        user = self._find_user(user_id)
+        if user is None:
+            raise AppError(401, "UNAUTHENTICATED", "Unknown or missing user. Select a user to act as.")
+        return {
+            "id": user["id"],
+            "name": user["name"],
+            "role_ids": list(user["role_ids"]),
+            "permissions": sorted(self.permissions_of(user)),
+        }
+
     def authorize(self, user_id, permission, action=None, log_allowed=True):
         user = self._find_user(user_id)
         if user is None:

@@ -139,3 +139,12 @@ def test_a_role_manager_who_is_not_admin_cannot_promote_themselves_to_admin(clie
     assert response.get_json()["error"]["code"] == "ADMIN_ROLE_RESTRICTED"
     users = call(client, "GET", "/api/users", user="u-alice").get_json()
     assert next(u for u in users if u["id"] == "u-bob")["role_ids"] == [created["id"]]
+
+
+def test_me_returns_the_acting_users_permissions_and_requires_a_known_user(client):
+    response = call(client, "GET", "/api/me", user="u-bob")
+
+    assert response.status_code == 200
+    assert "reports:export" in response.get_json()["permissions"]
+    assert "users:delete" not in response.get_json()["permissions"]
+    assert call(client, "GET", "/api/me").status_code == 401

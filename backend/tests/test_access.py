@@ -62,3 +62,18 @@ def test_allowed_reads_can_skip_logging_but_denials_are_always_logged(access, au
     with pytest.raises(AppError):
         access.authorize("u-carol", "audit:read", log_allowed=False)
     assert len(audit.list_entries()) == 1
+
+
+
+def test_describe_returns_effective_permissions_without_writing_to_the_audit_log(access, audit):
+    me = access.describe("u-carol")
+
+    assert me == {"id": "u-carol", "name": "Carol Viewer", "role_ids": ["viewer"], "permissions": ["users:read"]}
+    assert audit.list_entries() == []
+
+
+@pytest.mark.parametrize("bad_user_id", ["nobody", None])
+def test_describe_for_an_unknown_user_gets_401(access, bad_user_id):
+    with pytest.raises(AppError) as exc_info:
+        access.describe(bad_user_id)
+    assert exc_info.value.status == 401
