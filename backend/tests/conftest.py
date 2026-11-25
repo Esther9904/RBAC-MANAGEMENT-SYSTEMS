@@ -26,5 +26,5 @@ def role_service(store):
 
 
 @pytest.fixture
-def user_service(store):
-    return UserService(store)
+def user_service(store, audit):
+    return UserService(store, audit)

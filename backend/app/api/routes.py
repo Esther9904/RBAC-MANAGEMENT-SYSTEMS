@@ -39,7 +39,8 @@ def list_users():
 @api.put("/users/<user_id>/roles")
 @require_permission("roles:manage", action="Assign user roles")
 def assign_user_roles(user_id):
-    return jsonify(_services()["users"].assign_roles(user_id, _read_json()))
+    actor_id = request.headers.get(ACTOR_HEADER)
+    return jsonify(_services()["users"].assign_roles(user_id, _read_json(), actor_id))
 
 
 @api.get("/roles")

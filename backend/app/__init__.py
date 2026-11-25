@@ -21,7 +21,7 @@ def create_app(store=None):
         "audit": audit,
         "access": AccessService(store, audit),
         "roles": RoleService(store),
-        "users": UserService(store),
+        "users": UserService(store, audit),
     }
 
     app.register_blueprint(api, url_prefix="/api")

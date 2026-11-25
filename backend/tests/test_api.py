@@ -123,3 +123,19 @@ def test_unexpected_errors_return_a_generic_500_without_leaking_details(app):
     assert response.status_code == 500
     assert response.get_json()["error"]["code"] == "INTERNAL_ERROR"
     assert "secret" not in response.get_data(as_text=True)
+
+
+
+def test_a_role_manager_who_is_not_admin_cannot_promote_themselves_to_admin(client):
+    created = call(
+        client, "POST", "/api/roles", user="u-alice",
+        body={"name": "RoleManager", "permissions": ["roles:manage", "users:read"]},
+    ).get_json()
+    call(client, "PUT", "/api/users/u-bob/roles", user="u-alice", body={"role_ids": [created["id"]]})
+
+    response = call(client, "PUT", "/api/users/u-bob/roles", user="u-bob", body={"role_ids": ["admin"]})
+
+    assert response.status_code == 403
+    assert response.get_json()["error"]["code"] == "ADMIN_ROLE_RESTRICTED"
+    users = call(client, "GET", "/api/users", user="u-alice").get_json()
+    assert next(u for u in users if u["id"] == "u-bob")["role_ids"] == [created["id"]]
