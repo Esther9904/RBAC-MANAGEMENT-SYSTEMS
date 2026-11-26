@@ -53,4 +53,15 @@ export const api = {
   performAction: (actorId, actionKey) =>
     request(`/actions/${encodeURIComponent(actionKey)}`, { method: 'POST', actorId }),
   getAuditLog: (actorId) => request('/audit-log', { actorId }),
+  getUsers: (actorId) => request('/users', { actorId }),
+  getRoles: (actorId) => request('/roles', { actorId }),
+  createRole: (actorId, body) => request('/roles', { method: 'POST', body, actorId }),
+  updateRole: (actorId, roleId, body) =>
+    request(`/roles/${encodeURIComponent(roleId)}`, { method: 'PUT', body, actorId }),
+  assignRoles: (actorId, userId, roleIds) =>
+    request(`/users/${encodeURIComponent(userId)}/roles`, {
+      method: 'PUT',
+      body: { role_ids: roleIds },
+      actorId,
+    }),
 };

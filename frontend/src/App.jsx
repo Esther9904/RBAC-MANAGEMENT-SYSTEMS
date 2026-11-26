@@ -1,10 +1,16 @@
 import { useCallback, useState } from 'react';
 import AuditLog from './components/AuditLog.jsx';
+import RolesPage from './components/RolesPage.jsx';
 import TestAccess from './components/TestAccess.jsx';
 import UserSwitcher from './components/UserSwitcher.jsx';
+import UsersPage from './components/UsersPage.jsx';
 import { useActor } from './context/ActorContext.jsx';
 
-const TABS = [{ id: 'access', label: 'Test Access' }];
+const TABS = [
+  { id: 'roles', label: 'Roles' },
+  { id: 'users', label: 'Users' },
+  { id: 'access', label: 'Test Access' },
+];
 
 export default function App() {
   const { actorId, error } = useActor();
@@ -36,6 +42,9 @@ export default function App() {
       <main>
         {error && <p className="notice notice-denied" role="alert">{error}</p>}
         {!error && !actorId && <p className="muted">Loading…</p>}
+
+        {actorId && tab === 'roles' && <RolesPage key={actorId} />}
+        {actorId && tab === 'users' && <UsersPage key={actorId} />}
 
         {actorId && tab === 'access' && (
           <>

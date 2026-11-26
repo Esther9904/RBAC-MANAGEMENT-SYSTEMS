@@ -1,24 +1,18 @@
 import { api } from '../api/client.js';
 import { useActor } from '../context/ActorContext.jsx';
 import { useFetch } from '../hooks/useFetch.js';
+import RequirePermission from './RequirePermission.jsx';
 
-// Outer component: decides whether we should even ask the server for the log.
 export default function AuditLog({ refreshKey }) {
-  const { can, permissionsLoaded } = useActor();
-
-  if (!permissionsLoaded) return <p className="muted">Loading…</p>;
-  if (!can('audit:read')) {
-    return (
-      <p className="notice notice-neutral">
-        This user does not have the <code>audit:read</code> permission, so the log is not requested. Switch to a
-        user who has it (for example an Admin or Auditor). The server would refuse the request anyway.
-      </p>
-    );
-  }
-  return <AuditTable refreshKey={refreshKey} />;
+  return (
+    <RequirePermission permission="audit:read">
+      <AuditTable refreshKey={refreshKey} />
+    </RequirePermission>
+  );
 }
 
-// Inner component: only mounted when the user may read the log, so it never triggers a pointless denial.
+// Only mounted when the user may read the log, so it never triggers a pointless denial.
+
 function AuditTable({ refreshKey }) {
   const { actorId } = useActor();
   const { data, error, loading, reload } = useFetch(() => api.getAuditLog(actorId), [actorId, refreshKey]);

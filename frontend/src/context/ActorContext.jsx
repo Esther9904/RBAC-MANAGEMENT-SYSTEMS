@@ -10,6 +10,7 @@ export function ActorProvider({ children }) {
   // Permissions are stored together with the user they belong to, so after a switch
   // we never mistake the previous user's permissions for the new user's.
   const [loaded, setLoaded] = useState({ actorId: '', permissions: [] });
+  const [refreshCount, setRefreshCount] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function ActorProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, [actorId]);
+  }, [actorId, refreshCount]);
 
   const permissionsLoaded = loaded.actorId === actorId && actorId !== '';
 
@@ -50,9 +51,12 @@ export function ActorProvider({ children }) {
     [permissionsLoaded, loaded],
   );
 
+  // Call after roles or assignments change, so the hints match what the server now allows.
+  const refreshPermissions = useCallback(() => setRefreshCount((count) => count + 1), []);
+
   const value = useMemo(
-    () => ({ users, actorId, setActorId, permissionsLoaded, can, error }),
-    [users, actorId, permissionsLoaded, can, error],
+    () => ({ users, actorId, setActorId, permissionsLoaded, can, refreshPermissions, error }),
+    [users, actorId, permissionsLoaded, can, refreshPermissions, error],
   );
   return <ActorContext.Provider value={value}>{children}</ActorContext.Provider>;
 }
