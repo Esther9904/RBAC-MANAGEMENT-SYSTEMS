@@ -1,20 +1,3 @@
-import pytest
-
-from app import create_app
-
-
-@pytest.fixture
-def app():
-    app = create_app()
-    app.config["TESTING"] = True
-    return app
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
 def call(client, method, path, user=None, body=None, raw=None):
     headers = {"X-User-Id": user} if user else {}
     if raw is not None:

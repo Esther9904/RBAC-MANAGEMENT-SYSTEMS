@@ -1,10 +1,12 @@
 import pytest
 
+from app import create_app
 from app.domain.store import create_store
 from app.services.access_service import AccessService
 from app.services.audit_log import AuditLog
 from app.services.role_service import RoleService
 from app.services.user_service import UserService
+
 
 @pytest.fixture
 def store():
@@ -20,6 +22,7 @@ def audit(store):
 def access(store, audit):
     return AccessService(store, audit)
 
+
 @pytest.fixture
 def role_service(store):
     return RoleService(store)
@@ -28,3 +31,15 @@ def role_service(store):
 @pytest.fixture
 def user_service(store, audit):
     return UserService(store, audit)
+
+
+@pytest.fixture
+def app():
+    app = create_app()
+    app.config["TESTING"] = True
+    return app
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
